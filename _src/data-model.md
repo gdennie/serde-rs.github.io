@@ -5,24 +5,24 @@ interact. You can think of it as Serde's type system.
 
 In code, the serialization half of the Serde data model is defined by the
 [`Serializer`] trait and the deserialization half is defined by the
-[`Deserializer`] trait. These are a way of mapping every Rust data structure
+[`Deserializer`] trait. There is a mapping for every Rust basic data structure
 into one of 29 possible types. Each method of the `Serializer` trait corresponds
-to one of the types of the data model.
+to one of the types of the Serde data model.
 
-When serializing a data structure to some format, the [`Serialize`]
-implementation for the data structure is responsible for mapping the data
+When serializing a data structure into some format, the [`Serialize`]
+implementation for the data structure is responsible for mapping that data
 structure into the Serde data model by invoking exactly one of the `Serializer`
-methods, while the `Serializer` implementation for the data format is
-responsible for mapping the Serde data model into the intended output
+methods. Additionally, a `Serializer` implementation for the target data format is
+responsible for mapping the Serde data model into its
 representation.
 
-When deserializing a data structure from some format, the [`Deserialize`]
-implementation for the data structure is responsible for mapping the data
-structure into the Serde data model by passing to the `Deserializer` a
-[`Visitor`] implementation that can receive the various types of the data model,
-while the `Deserializer` implementation for the data format is responsible for
-mapping the input data into the Serde data model by invoking exactly one of the
-`Visitor` methods.
+When deserializing a data structure from a data format, the [`Deserialize`]
+implementation for the data format is responsible for two things. The first is providing an implementation of [`Visitor`] to map provided portions of the input into the Serde data model per the various trait functions. The second is providing an implementation of [`Deserialize`] that invokes the appropriate method on Visitor against the appropriate portion of the input. 
+Additionally, a `Deserializer` implementation for the target data structure itself
+is responsible for constructing a [`Visitor`] over the input and building the data structure by passing it to functions as necessary for constructing the subcomponents of the data structure 
+from the input (or remaining input). Eventually
+these functions will invoke methods on the provided [`Visitor`] to consume the
+portion of the input they will be provided.
 
 [`Serializer`]: https://docs.rs/serde/1/serde/trait.Serializer.html
 [`Deserializer`]: https://docs.rs/serde/1/serde/trait.Deserializer.html
